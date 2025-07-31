@@ -9,7 +9,7 @@ stages:
       - job: Build
         displayName: "Build Node.js Azure Function"
         pool:
-          vmImage: windows-latest
+          name: song-bird
         steps:
           - task: NodeTool@0
             inputs:
@@ -41,7 +41,7 @@ stages:
       - job: Test
         displayName: "Run Unit Tests"
         pool:
-          vmImage: windows-latest
+          name: song-bird
         steps:
           - task: NodeTool@0
             inputs:
@@ -61,7 +61,7 @@ stages:
       - job: Deploy
         displayName: "Deploy to Azure Function App"
         pool:
-          vmImage: windows-latest
+          name: song-bird
         steps:
           # Download build artifact
           - download: current
