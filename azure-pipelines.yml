@@ -21,15 +21,31 @@ stages:
               npm run build
             displayName: "Install dependencies and build"
 
-          # Publish build artifacts (zipped for deployment)
+          # Copy only the files required for deployment
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: "$(System.DefaultWorkingDirectory)"
+              Contents: |
+                host.json
+                local.settings.json
+                package.json
+                package-lock.json
+                **/*.js
+                **/*.json
+                **/function.json
+              TargetFolder: "$(Build.ArtifactStagingDirectory)/staging"
+            displayName: "Prepare deployment files"
+
+          # Archive the clean staging folder
           - task: ArchiveFiles@2
             inputs:
-              rootFolderOrFile: "." # Function app project folder
+              rootFolderOrFile: "$(Build.ArtifactStagingDirectory)/staging"
               includeRootFolder: false
               archiveType: zip
               archiveFile: "$(Build.ArtifactStagingDirectory)/functionapp.zip"
               replaceExistingArchive: true
 
+          # Publish only the zip
           - publish: "$(Build.ArtifactStagingDirectory)/functionapp.zip"
             artifact: drop
 
@@ -63,7 +79,7 @@ stages:
         pool:
           name: song-bird
         steps:
-          # Download build artifact
+          # Download the artifact from previous stage
           - download: current
             artifact: drop
 
