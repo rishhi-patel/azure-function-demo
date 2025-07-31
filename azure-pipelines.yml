@@ -1,77 +1,75 @@
 trigger:
-- main  # Your default branch
+  - main
 
 stages:
-# -------------------- BUILD STAGE --------------------
-- stage: Build
-  displayName: "Build Stage"
-  jobs:
-  - job: Build
-    displayName: "Build Node.js Azure Function"
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x'
-      displayName: 'Install Node.js'
+  # -------------------- BUILD STAGE --------------------
+  - stage: Build
+    displayName: "Build Stage"
+    jobs:
+      - job: Build
+        displayName: "Build Node.js Azure Function"
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+            displayName: "Install Node.js"
 
-    - script: |
-        npm install
-        # Remove the next line if no build step is required
-        npm run build
-      displayName: 'Install dependencies and build'
+          - script: |
+              npm install
+              npm run build
+            displayName: "Install dependencies and build"
 
-    # Publish build artifacts (zipped for deployment)
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: '.'  # Your function project root
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: '$(Build.ArtifactStagingDirectory)/functionapp.zip'
-        replaceExistingArchive: true
+          # Publish build artifacts (zipped for deployment)
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: "." # Function app project folder
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: "$(Build.ArtifactStagingDirectory)/functionapp.zip"
+              replaceExistingArchive: true
 
-    - publish: '$(Build.ArtifactStagingDirectory)/functionapp.zip'
-      artifact: drop
+          - publish: "$(Build.ArtifactStagingDirectory)/functionapp.zip"
+            artifact: drop
 
-# -------------------- TEST STAGE --------------------
-- stage: Test
-  displayName: "Test Stage"
-  dependsOn: Build
-  jobs:
-  - job: Test
-    displayName: "Run Unit Tests"
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x'
-      displayName: 'Install Node.js'
+  # -------------------- TEST STAGE --------------------
+  - stage: Test
+    displayName: "Test Stage"
+    dependsOn: Build
+    jobs:
+      - job: Test
+        displayName: "Run Unit Tests"
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+            displayName: "Install Node.js"
 
-    - script: |
-        npm install
-        npm test
-      displayName: 'Run Unit Tests'
+          - script: |
+              npm install
+              npm test
+            displayName: "Run Unit Tests"
 
-# -------------------- DEPLOY STAGE --------------------
-- stage: Deploy
-  displayName: "Deploy Stage"
-  dependsOn: Test
-  jobs:
-  - job: Deploy
-    displayName: "Deploy to Azure Function App"
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    # Download build artifact
-    - download: current
-      artifact: drop
+  # -------------------- DEPLOY STAGE --------------------
+  - stage: Deploy
+    displayName: "Deploy Stage"
+    dependsOn: Test
+    jobs:
+      - job: Deploy
+        displayName: "Deploy to Azure Function App"
+        pool:
+          vmImage: windows-latest
+        steps:
+          # Download build artifact
+          - download: current
+            artifact: drop
 
-    # Deploy to Azure Function App
-    - task: AzureFunctionApp@1
-      inputs:
-        azureSubscription: 'exo-service-connection'  
-        appType: 'functionApp'                      
-        appName: 'rishhi-func-demo'                 
-        package: '$(Pipeline.Workspace)/drop/functionapp.zip'
+          - task: AzureFunctionApp@1
+            inputs:
+              azureSubscription: "exo-service-connection"
+              appType: "functionApp"
+              appName: "rishhi-func-demo"
+              package: "$(Pipeline.Workspace)/drop/functionapp.zip"
