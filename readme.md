@@ -127,7 +127,8 @@ Hello, world!
 
 ## 6. Result
 
-- **Function URL:** `https://rishhi-func-demo-ccc9etg0a3h0ebe4.canadacentral-01.azurewebsites.net/api/HttpExample`
+- **Function URL:** https://rishhi-func-demo-ccc9etg0a3h0ebe4.canadacentral-01.azurewebsites.net/api/HttpExample
+  
 - **Screenshots:**
 
   1. Build Stage Success
