@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        AZURE_CREDENTIALS = credentials('Azure-rishhi.dev')
         FUNCTION_APP_NAME = 'rishhi-func-demo'
         RESOURCE_GROUP = 'exo-code'
         TENANT_ID = '31e2cd05-f1eb-4c69-ae74-4ba8110fd035'
@@ -13,10 +12,11 @@ pipeline {
     }
 
     stages {
+
         stage('Build') {
             steps {
                 script {
-                    echo 'Installing Node.js dependencies...'
+                    echo '📦 Building Node.js Azure Function...'
                     sh 'npm install'
                 }
             }
@@ -37,7 +37,7 @@ pipeline {
                     echo '📁 Zipping function for deployment...'
                     sh '''
                         rm -f function.zip
-                        zip -r function.zip * -x "*.git*" "node_modules/*" "*.zip"
+                        zip -r function.zip * -x "*.git*" "node_modules/*"
                     '''
                 }
             }
@@ -47,16 +47,21 @@ pipeline {
             steps {
                 script {
                     echo '☁️ Deploying Azure Function to cloud...'
-                    sh """
-                        az login --service-principal \
-                          -u $AZURE_CREDENTIALS_USR \
-                          -p $AZURE_CREDENTIALS_PSW \
-                          --tenant $TENANT_ID && \
-                        az functionapp deployment source config-zip \
-                          --resource-group $RESOURCE_GROUP \
-                          --name $FUNCTION_APP_NAME \
-                          --src function.zip
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'Azure-rishhi.dev',
+                                                     usernameVariable: 'AZURE_CLIENT_ID',
+                                                     passwordVariable: 'AZURE_CLIENT_SECRET')]) {
+                        sh '''
+                            az login --service-principal \
+                              -u $AZURE_CLIENT_ID \
+                              -p $AZURE_CLIENT_SECRET \
+                              --tenant 31e2cd05-f1eb-4c69-ae74-4ba8110fd035
+
+                            az functionapp deployment source config-zip \
+                              --resource-group exo-code \
+                              --name rishhi-func-demo \
+                              --src function.zip
+                        '''
+                    }
                 }
             }
         }
