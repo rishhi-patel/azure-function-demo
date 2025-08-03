@@ -1,13 +1,14 @@
-const { app } = require('@azure/functions');
+const { app } = require("@azure/functions")
 
-app.http('HttpExample', {
-    methods: ['GET', 'POST'],
-    authLevel: 'anonymous',
-    handler: async (request, context) => {
-        context.log(`Http function processed request for url "${request.url}"`);
+app.http("HttpExample", {
+  methods: ["GET", "POST"],
+  authLevel: "anonymous",
+  handler: async (request, context) => {
+    context.log(`Http function processed request for url "${request.url}"`)
 
-        const name = request.query.get('name') || await request.text() || 'world';
+    const name =
+      request.query.get("name") || (await request.text()) || "Jenkins"
 
-        return { body: `Hello, ${name}!` };
-    }
-});
+    return { body: `Hello, ${name}!` }
+  },
+})
