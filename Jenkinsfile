@@ -13,17 +13,10 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                echo 'Fetching code from GitHub...'
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
                 script {
-                    echo 'Building Node.js Azure Function...'
+                    echo 'Installing Node.js dependencies...'
                     sh 'npm install'
                 }
             }
@@ -32,7 +25,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    echo 'Running unit tests...'
+                    echo '🧪 Running tests...'
                     sh 'npm test'
                 }
             }
@@ -41,10 +34,10 @@ pipeline {
         stage('Package') {
             steps {
                 script {
-                    echo 'Zipping function for deployment...'
+                    echo '📁 Zipping function for deployment...'
                     sh '''
                         rm -f function.zip
-                        zip -r function.zip * -x "*.git*" "node_modules/.cache/*"
+                        zip -r function.zip * -x "*.git*" "node_modules/*" "*.zip"
                     '''
                 }
             }
@@ -53,17 +46,16 @@ pipeline {
         stage('Deploy to Azure') {
             steps {
                 script {
-                    echo 'Deploying Azure Function...'
+                    echo '☁️ Deploying Azure Function to cloud...'
                     sh """
                         az login --service-principal \
-                            -u $AZURE_CREDENTIALS_USR \
-                            -p $AZURE_CREDENTIALS_PSW \
-                            --tenant $TENANT_ID
-
+                          -u $AZURE_CREDENTIALS_USR \
+                          -p $AZURE_CREDENTIALS_PSW \
+                          --tenant $TENANT_ID && \
                         az functionapp deployment source config-zip \
-                            --resource-group $RESOURCE_GROUP \
-                            --name $FUNCTION_APP_NAME \
-                            --src function.zip
+                          --resource-group $RESOURCE_GROUP \
+                          --name $FUNCTION_APP_NAME \
+                          --src function.zip
                     """
                 }
             }
