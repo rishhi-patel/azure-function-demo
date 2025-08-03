@@ -13,6 +13,13 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                echo 'Fetching code from GitHub...'
+                checkout scm
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
@@ -25,7 +32,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    echo 'Running tests...'
+                    echo 'Running unit tests...'
                     sh 'npm test'
                 }
             }
@@ -37,7 +44,7 @@ pipeline {
                     echo 'Zipping function for deployment...'
                     sh '''
                         rm -f function.zip
-                        zip -r function.zip * -x "*.git*"
+                        zip -r function.zip * -x "*.git*" "node_modules/.cache/*"
                     '''
                 }
             }
@@ -46,8 +53,8 @@ pipeline {
         stage('Deploy to Azure') {
             steps {
                 script {
-                    echo 'Deploying to Azure Function...'
-                    sh '''
+                    echo 'Deploying Azure Function...'
+                    sh """
                         az login --service-principal \
                             -u $AZURE_CREDENTIALS_USR \
                             -p $AZURE_CREDENTIALS_PSW \
@@ -57,7 +64,7 @@ pipeline {
                             --resource-group $RESOURCE_GROUP \
                             --name $FUNCTION_APP_NAME \
                             --src function.zip
-                    '''
+                    """
                 }
             }
         }
