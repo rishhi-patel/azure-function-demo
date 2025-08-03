@@ -13,6 +13,13 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                echo 'Fetching code from GitHub...'
+                checkout scm
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
