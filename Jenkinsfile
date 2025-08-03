@@ -37,7 +37,7 @@ pipeline {
                     echo '📁 Zipping function for deployment...'
                     sh '''
                         rm -f function.zip
-                        zip -r function.zip * -x "*.git*" "node_modules/*"
+                        zip -r function.zip HttpExample host.json package.json package-lock.json
                     '''
                 }
             }
