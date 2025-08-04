@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     echo '🧪 Running tests...'
-                    sh 'npm test --prefix src/functions'
+                    sh 'npm test'
                 }
             }
         }
