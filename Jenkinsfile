@@ -23,8 +23,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    echo '📦 Building Node.js Azure Function...'
-                    sh 'npm install'
+                    echo '📦 Installing Node.js dependencies...'
+                    sh 'npm install --prefix src/functions'
                 }
             }
         }
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     echo '🧪 Running tests...'
-                    sh 'npm test'
+                    sh 'npm test --prefix src/functions'
                 }
             }
         }
@@ -44,7 +44,11 @@ pipeline {
                     echo '📁 Zipping function for deployment...'
                     sh '''
                         rm -f function.zip
-                        zip -r function.zip HttpExample host.json package.json package-lock.json
+                        cd src/functions
+                        zip -r ../../function.zip * -x "*.git*" "*@tmp*" "*.DS_Store"
+                        cd ../..
+                        echo "----- Zip file content -----"
+                        unzip -l function.zip
                     '''
                 }
             }
