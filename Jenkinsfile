@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     echo '📦 Installing Node.js dependencies...'
-                    sh 'npm install --prefix src/functions'
+                    sh 'npm install'
                 }
             }
         }
