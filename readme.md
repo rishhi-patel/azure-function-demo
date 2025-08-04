@@ -126,7 +126,7 @@ pipeline {
 
   1. Jenkins
      ![1754337590645](image/readme/1754337590645.png)
-     ![1754337595097](image/readme/1754337595097.png)adme/1754159880232.png)
+     ![1754337595097](image/readme/1754337595097.png)
 
   2. Browser screenshot of function output
      ![1754159890489](image/readme/1754159890489.png)
