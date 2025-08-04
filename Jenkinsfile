@@ -44,11 +44,7 @@ pipeline {
                     echo '📁 Zipping function for deployment...'
                     sh '''
                         rm -f function.zip
-                        cd src/functions
-                        zip -r ../../function.zip * -x "*.git*" "*@tmp*" "*.DS_Store"
-                        cd ../..
-                        echo "----- Zip file content -----"
-                        unzip -l function.zip
+                        zip -r function.zip host.json package.json package-lock.json src -x "*.git*" "*node_modules*" "*.vscode*" "*@tmp*" "*.DS_Store"
                     '''
                 }
             }
